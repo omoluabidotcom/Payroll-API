@@ -3,6 +3,7 @@ package com.omoluabidotcom.payroll.Controller;
 import java.util.List;
 
 import com.omoluabidotcom.payroll.entity.Employee;
+import com.omoluabidotcom.payroll.error.EmployeeNotFoundException;
 import com.omoluabidotcom.payroll.repository.EmployeeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -39,12 +40,12 @@ class EmployeeController {
 
     // Single item
 
-//    @GetMapping("/employees/{id}")
-//    Employee one(@PathVariable Long id) {
-//
-//        return employeeRepository.findById(id)
-//                .orElseThrow(() -> new EmployeeNotFoundException(id));
-//    }
+    @GetMapping("/employees/{id}")
+    Employee one(@PathVariable Long id) {
+
+        return employeeRepository.findById(id)
+                .orElseThrow(() -> new EmployeeNotFoundException(id));
+    }
 
     @PutMapping("/employees/{id}")
     Employee replaceEmployee(@RequestBody Employee newEmployee, @PathVariable Long id) {
