@@ -20,18 +20,10 @@ class EmployeeController {
     @Autowired
     private EmployeeRepository employeeRepository;
 
-//    EmployeeController(EmployeeRepository employeeRepository) {
-//        this.employeeRepository = employeeRepository;
-//    }
-
-    // Aggregate root
-
-    // tag::get-aggregate-root[]
     @GetMapping("/employees")
     List<Employee> all() {
         return employeeRepository.findAll();
     }
-    // end::get-aggregate-root[]
 
     @PostMapping("/employees")
     Employee newEmployee(@RequestBody Employee newEmployee) {
@@ -66,4 +58,5 @@ class EmployeeController {
     void deleteEmployee(@PathVariable Long id) {
         employeeRepository.deleteById(id);
     }
+
 }
