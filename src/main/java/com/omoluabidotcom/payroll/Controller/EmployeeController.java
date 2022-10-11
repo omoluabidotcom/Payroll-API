@@ -1,11 +1,13 @@
 package com.omoluabidotcom.payroll.Controller;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.omoluabidotcom.payroll.entity.Employee;
 import com.omoluabidotcom.payroll.error.EmployeeNotFoundException;
 import com.omoluabidotcom.payroll.repository.EmployeeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -48,18 +50,17 @@ class EmployeeController {
     }
 
     @PutMapping("/employees/{id}")
-    Employee replaceEmployee(@RequestBody Employee newEmployee, @PathVariable Long id) {
+    CollectionModel replaceEmployee(@RequestBody Employee newEmployee, @PathVariable Long id) {
 
-        return employeeRepository.findById(id)
-                .map(employee -> {
-                    employee.setName(newEmployee.getName());
-                    employee.setRole(newEmployee.getRole());
-                    return employeeRepository.save(employee);
-                })
-                .orElseGet(() -> {
-                    newEmployee.setId(id);
-                    return employeeRepository.save(newEmployee);
-                });
+        List<EntityModel<Employee>> employees = employeeRepository.findAll().
+                stream().map(employee -> {
+                    return EntityModel.of(employee,
+                            linkTo(methodOn(EmployeeController.class).one(id)).withSelfRel(),
+                            linkTo(methodOn(EmployeeController.class).all()).withRel("employees"));
+                }).collect(Collectors.toList());
+
+        return CollectionModel.of(employees,
+                linkTo(methodOn(EmployeeController.class).all()).withRel("employee"));
     }
 
     @DeleteMapping("/employees/{id}")
