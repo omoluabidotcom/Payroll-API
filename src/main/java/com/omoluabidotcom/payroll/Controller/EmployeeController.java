@@ -27,8 +27,18 @@ class EmployeeController {
     private EmployeeRepository employeeRepository;
 
     @GetMapping("/employees")
-    List<Employee> all() {
-        return employeeRepository.findAll();
+    CollectionModel<EntityModel<Employee>> all() {
+
+        //return employeeRepository.findAll();
+        List<EntityModel<Employee>> employees = employeeRepository.findAll().
+                stream().map(employee -> {
+                    return EntityModel.of(employee,
+                            linkTo(methodOn(EmployeeController.class).one(employee.getId())).withSelfRel(),
+                            linkTo(methodOn(EmployeeController.class).all()).withRel("employees"));
+                }).collect(Collectors.toList());
+
+        return CollectionModel.of(employees,
+                linkTo(methodOn(EmployeeController.class).all()).withRel("employee"));
     }
 
     @PostMapping("/employees")
@@ -50,17 +60,18 @@ class EmployeeController {
     }
 
     @PutMapping("/employees/{id}")
-    CollectionModel replaceEmployee(@RequestBody Employee newEmployee, @PathVariable Long id) {
+    Employee replaceEmployee(@RequestBody Employee newEmployee, @PathVariable Long id) {
 
-        List<EntityModel<Employee>> employees = employeeRepository.findAll().
-                stream().map(employee -> {
-                    return EntityModel.of(employee,
-                            linkTo(methodOn(EmployeeController.class).one(id)).withSelfRel(),
-                            linkTo(methodOn(EmployeeController.class).all()).withRel("employees"));
-                }).collect(Collectors.toList());
-
-        return CollectionModel.of(employees,
-                linkTo(methodOn(EmployeeController.class).all()).withRel("employee"));
+        return employeeRepository.findById(id)
+                .map(employee -> {
+                    employee.setName(newEmployee.getName());
+                    employee.setRole(newEmployee.getRole());
+                    return employeeRepository.save(employee);
+                })
+                .orElseGet(() -> {
+                    newEmployee.setId(id);
+                    return employeeRepository.save(newEmployee);
+                });
     }
 
     @DeleteMapping("/employees/{id}")
