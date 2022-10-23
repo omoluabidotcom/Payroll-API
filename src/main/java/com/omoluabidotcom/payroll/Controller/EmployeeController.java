@@ -5,6 +5,7 @@ import java.util.stream.Collectors;
 
 import com.omoluabidotcom.payroll.entity.Employee;
 import com.omoluabidotcom.payroll.error.EmployeeNotFoundException;
+import com.omoluabidotcom.payroll.model.EmployeeModelAssembler;
 import com.omoluabidotcom.payroll.repository.EmployeeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
@@ -21,24 +22,22 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @RestController
-class EmployeeController {
+public class EmployeeController {
 
     @Autowired
     private EmployeeRepository employeeRepository;
 
-    @GetMapping("/employees")
-    CollectionModel<EntityModel<Employee>> all() {
+    @Autowired
+    private EmployeeModelAssembler employeeModelAssembler;
 
-        //return employeeRepository.findAll();
-        List<EntityModel<Employee>> employees = employeeRepository.findAll().
-                stream().map(employee -> {
-                    return EntityModel.of(employee,
-                            linkTo(methodOn(EmployeeController.class).one(employee.getId())).withSelfRel(),
-                            linkTo(methodOn(EmployeeController.class).all()).withRel("employees"));
-                }).collect(Collectors.toList());
+    @GetMapping("/employees")
+    public CollectionModel<EntityModel<Employee>> all() {
+
+        List<EntityModel<Employee>> employees = employeeRepository.findAll().stream()
+                .map(employeeModelAssembler::toModel).collect(Collectors.toList());
 
         return CollectionModel.of(employees,
-                linkTo(methodOn(EmployeeController.class).all()).withRel("employee"));
+                linkTo(methodOn(EmployeeController.class).all()).withSelfRel());
     }
 
     @PostMapping("/employees")
@@ -46,17 +45,13 @@ class EmployeeController {
         return employeeRepository.save(newEmployee);
     }
 
-    // Single item
-
     @GetMapping("/employees/{id}")
-    EntityModel<Employee> one(@PathVariable Long id) {
+    public EntityModel<Employee> one(@PathVariable Long id) {
 
         Employee employee = employeeRepository.findById(id)
                 .orElseThrow(() -> new EmployeeNotFoundException(id));
 
-        return EntityModel.of(employee,
-                linkTo(methodOn(EmployeeController.class).one(id)).withSelfRel(),
-                linkTo(methodOn(EmployeeController.class).all()).withRel("employee"));
+        return employeeModelAssembler.toModel(employee);
     }
 
     @PutMapping("/employees/{id}")
