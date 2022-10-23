@@ -10,6 +10,8 @@ import com.omoluabidotcom.payroll.repository.EmployeeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.IanaLinkRelations;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -41,8 +43,13 @@ public class EmployeeController {
     }
 
     @PostMapping("/employees")
-    Employee newEmployee(@RequestBody Employee newEmployee) {
-        return employeeRepository.save(newEmployee);
+    ResponseEntity<?> newEmployee(@RequestBody Employee newEmployee) {
+
+         EntityModel<Employee> entityModel = employeeModelAssembler.toModel(employeeRepository.save(newEmployee));
+
+         return ResponseEntity
+                 .created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri())
+                 .body(entityModel);
     }
 
     @GetMapping("/employees/{id}")
