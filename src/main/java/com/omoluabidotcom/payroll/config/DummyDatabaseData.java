@@ -21,8 +21,8 @@ public class DummyDatabaseData {
     CommandLineRunner commandLineRunner(EmployeeRepository repository) {
 
         return args -> {
-            log.info("Preloading " + employeeRepository.save(new Employee("Goodluck Ebele", "Kind")));
-            log.info("Preloading " + employeeRepository.save(new Employee("Umar Yaradua", "Gentle")));
+            log.info("Preloading " + employeeRepository.save(new Employee("Goodluck", "Ebele", "Kind")));
+            log.info("Preloading " + employeeRepository.save(new Employee("Umar", "Yaradua", "Gentle")));
         };
     }
 }
