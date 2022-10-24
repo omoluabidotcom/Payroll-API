@@ -7,6 +7,7 @@ import com.omoluabidotcom.payroll.entity.Employee;
 import com.omoluabidotcom.payroll.error.EmployeeNotFoundException;
 import com.omoluabidotcom.payroll.model.EmployeeModelAssembler;
 import com.omoluabidotcom.payroll.repository.EmployeeRepository;
+import org.hibernate.EntityMode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
@@ -62,9 +63,9 @@ public class EmployeeController {
     }
 
     @PutMapping("/employees/{id}")
-    Employee replaceEmployee(@RequestBody Employee newEmployee, @PathVariable Long id) {
+    ResponseEntity<?> replaceEmployee(@RequestBody Employee newEmployee, @PathVariable Long id) {
 
-        return employeeRepository.findById(id)
+        Employee updatedEmployees = employeeRepository.findById(id)
                 .map(employee -> {
                     employee.setName(newEmployee.getName());
                     employee.setRole(newEmployee.getRole());
@@ -74,6 +75,12 @@ public class EmployeeController {
                     newEmployee.setId(id);
                     return employeeRepository.save(newEmployee);
                 });
+
+        EntityModel<Employee> employeeEntityModel = employeeModelAssembler.toModel(updatedEmployees);
+
+        return ResponseEntity
+                .created(employeeEntityModel.getRequiredLink(IanaLinkRelations.SELF).toUri())
+                .body(employeeEntityModel);
     }
 
     @DeleteMapping("/employees/{id}")
