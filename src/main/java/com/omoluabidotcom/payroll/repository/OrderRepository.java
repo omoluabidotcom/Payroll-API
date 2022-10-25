@@ -1,2 +1,9 @@
-package com.omoluabidotcom.payroll.repository;public interface OrderRepository {
+package com.omoluabidotcom.payroll.repository;
+
+import com.omoluabidotcom.payroll.entity.Order;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface OrderRepository extends JpaRepository<Order, Long> {
 }
