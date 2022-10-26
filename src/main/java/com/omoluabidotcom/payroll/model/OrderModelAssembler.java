@@ -1,6 +1,7 @@
 package com.omoluabidotcom.payroll.model;
 
 import com.omoluabidotcom.payroll.Controller.EmployeeController;
+import com.omoluabidotcom.payroll.Controller.OrderController;
 import com.omoluabidotcom.payroll.entity.Order;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.RepresentationModelAssembler;
@@ -15,7 +16,7 @@ public class OrderModelAssembler implements RepresentationModelAssembler<Order, 
     @Override
     public EntityModel<Order> toModel(Order order) {
         return EntityModel.of(order,
-                linkTo(methodOn(EmployeeController.class).one(order.getId())).withSelfRel(),
-                linkTo(methodOn(EmployeeController.class).all()).withRel("orders"));
+                linkTo(methodOn(OrderController.class).one(order.getId())).withSelfRel(),
+                linkTo(methodOn(OrderController.class).all()).withRel("orders"));
     }
 }
