@@ -1,6 +1,7 @@
 package com.omoluabidotcom.payroll.Controller;
 
 import com.omoluabidotcom.payroll.entity.Order;
+import com.omoluabidotcom.payroll.error.OrderNotFoundException;
 import com.omoluabidotcom.payroll.model.OrderModelAssembler;
 import com.omoluabidotcom.payroll.repository.OrderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,7 +45,7 @@ public class OrderController {
     @GetMapping("/orders/{id}")
     public EntityModel<Order> one(@PathVariable Long id) {
         Order order = orderRepository.findById(id)
-                .orElseThrow(() -> OrderNotFoundException(id));
+                .orElseThrow(() -> new OrderNotFoundException(id));
         return EntityModel.of(order)
     }
 }
