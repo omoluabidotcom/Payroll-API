@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -38,5 +39,12 @@ public class OrderController {
 
         return CollectionModel.of(order,
                 linkTo(methodOn(OrderController.class).all()).withSelfRel());
+    }
+
+    @GetMapping("/orders/{id}")
+    public EntityModel<Order> one(@PathVariable Long id) {
+        Order order = orderRepository.findById(id)
+                .orElseThrow(() -> OrderNotFoundException(id));
+        return EntityModel.of(order)
     }
 }
