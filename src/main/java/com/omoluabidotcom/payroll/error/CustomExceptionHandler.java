@@ -7,13 +7,21 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ControllerAdvice
-public class EmloyeeNotFoundAdvice {
+public class CustomExceptionHandler {
 
     @ResponseBody
-    @ExceptionHandler(EmployeeNotFoundException.class)
+    @org.springframework.web.bind.annotation.ExceptionHandler(EmployeeNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     String EmployeeNotFoundHandler(EmployeeNotFoundException ex) {
 
         return ex.getMessage();
+    }
+
+    @ResponseBody
+    @ExceptionHandler(OrderNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    String OrderNotFoundHandler(OrderNotFoundException ex) {
+
+        return  ex.getMessage();
     }
 }
