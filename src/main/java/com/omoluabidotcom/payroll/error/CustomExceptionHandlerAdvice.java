@@ -7,10 +7,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ControllerAdvice
-public class CustomExceptionHandler {
+public class CustomExceptionHandlerAdvice {
 
     @ResponseBody
-    @org.springframework.web.bind.annotation.ExceptionHandler(EmployeeNotFoundException.class)
+    @ExceptionHandler(EmployeeNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     String EmployeeNotFoundHandler(EmployeeNotFoundException ex) {
 
