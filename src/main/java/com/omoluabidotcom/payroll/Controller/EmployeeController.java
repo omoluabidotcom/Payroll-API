@@ -7,7 +7,6 @@ import com.omoluabidotcom.payroll.entity.Employee;
 import com.omoluabidotcom.payroll.error.EmployeeNotFoundException;
 import com.omoluabidotcom.payroll.model.EmployeeModelAssembler;
 import com.omoluabidotcom.payroll.repository.EmployeeRepository;
-import org.hibernate.EntityMode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
