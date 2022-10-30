@@ -75,7 +75,23 @@ public class OrderController {
         return ResponseEntity
                 .status(HttpStatus.METHOD_NOT_ALLOWED)
                 .header(HttpHeaders.CONTENT_TYPE, MediaTypes.HTTP_PROBLEM_DETAILS_JSON_VALUE)
-                .body("You cannot cancel an order that is having this status" + order.getStatus());
+                .body("You cannot cancel an order that is having status " + order.getStatus());
+    }
+
+    @PutMapping("/orders/{id}/complete")
+    public ResponseEntity<?> completeOrder(@PathVariable Long id) {
+        Order order = orderRepository.findById(id)
+                .orElseThrow(() -> new OrderNotFoundException(id));
+
+        if(order.getStatus() == Status.IN_PROGRESS) {
+            order.setStatus(Status.COMPLETED);
+            return ResponseEntity.ok(orderModelAssembler.toModel(orderRepository.save(order)));
+        }
+
+        return ResponseEntity
+                .status(HttpStatus.METHOD_NOT_ALLOWED)
+                .header(HttpHeaders.CONTENT_TYPE, MediaTypes.HTTP_PROBLEM_DETAILS_JSON_VALUE)
+                .body("You cannot cancel an order that is having status " + order.getStatus());
     }
 
 }
