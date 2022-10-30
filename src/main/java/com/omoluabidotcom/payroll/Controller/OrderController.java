@@ -4,12 +4,12 @@ import com.omoluabidotcom.payroll.entity.Order;
 import com.omoluabidotcom.payroll.error.OrderNotFoundException;
 import com.omoluabidotcom.payroll.model.OrderModelAssembler;
 import com.omoluabidotcom.payroll.repository.OrderRepository;
+import com.omoluabidotcom.payroll.utility.Status;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -48,4 +48,14 @@ public class OrderController {
                 .orElseThrow(() -> new OrderNotFoundException(id));
         return orderModelAssembler.toModel(order);
     }
+
+    @PostMapping("/orders")
+    public ResponseEntity<EntityModel<Order>> newOrder(@RequestBody Order order) {
+        order.setStatus(Status.IN_PROGRESS);
+        Order newOrder = orderRepository.save(order);
+        return ResponseEntity
+                .created(linkTo(methodOn(OrderController.class).one(newOrder.getId())).toUri())
+                .body(orderModelAssembler.toModel(newOrder));
+    }
+
 }
