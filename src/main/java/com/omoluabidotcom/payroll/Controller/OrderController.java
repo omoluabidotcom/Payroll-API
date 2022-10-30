@@ -6,8 +6,12 @@ import com.omoluabidotcom.payroll.model.OrderModelAssembler;
 import com.omoluabidotcom.payroll.repository.OrderRepository;
 import com.omoluabidotcom.payroll.utility.Status;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.parsing.Problem;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.MediaTypes;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -56,6 +60,22 @@ public class OrderController {
         return ResponseEntity
                 .created(linkTo(methodOn(OrderController.class).one(newOrder.getId())).toUri())
                 .body(orderModelAssembler.toModel(newOrder));
+    }
+
+    @DeleteMapping("/orders/{id}/cancel")
+    public ResponseEntity<?> cancelOrder(@PathVariable Long id) {
+        Order order = orderRepository.findById(id)
+                .orElseThrow(() -> new OrderNotFoundException(id));
+
+        if(order.getStatus() == Status.IN_PROGRESS) {
+            order.setStatus(Status.CANCELLED);
+            return ResponseEntity.ok(orderModelAssembler.toModel(orderRepository.save(order)));
+        }
+
+        return ResponseEntity
+                .status(HttpStatus.METHOD_NOT_ALLOWED)
+                .header(HttpHeaders.CONTENT_TYPE, MediaTypes.HTTP_PROBLEM_DETAILS_JSON_VALUE)
+                .body("You cannot cancel an order that is having this status" + order.getStatus());
     }
 
 }
